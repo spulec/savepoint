@@ -10,12 +10,14 @@ class SavePoint(object):
         # where we'll store the modified scope
         self.path = path
         self.validate_input = False
+        self.replaying = False
 
     def __enter__(self):
         # get caller globals()
         caller = inspect.currentframe(1)
 
         if os.path.exists(self.path):
+            self.replaying = True
             # update scope from savepoint
             with open(self.path) as fp:
                 updated = pickle.load(fp)
@@ -46,4 +48,4 @@ class SavePoint(object):
             with open(self.path, 'w') as fp:
                 pickle.dump(updated, fp)
 
-        return True
+        return self.replaying
